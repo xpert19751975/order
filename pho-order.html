@@ -321,22 +321,9 @@ function setName() {
 // ── 기존 주문 불러오기 (중복 방지용) ──────────
 async function loadOrders() {
   try {
-    const res = await fetch(SCRIPT_URL);
-    const data = await res.json();
-    takenMap = {};
-    if (data.orders) {
-      data.orders.forEach(row => {
-        // 다른 사람 주문만 막음
-        if (row["이름"] !== myName) {
-          const menuId = MENU.find(m => m.name === row["메뉴명"])?.id;
-          if (menuId) takenMap[menuId] = row["이름"];
-        }
-      });
-    }
-    showToast(`환영해요, ${myName}님! 🍜`);
-  } catch(e) {
-    showToast(`환영해요, ${myName}님! 🍜`);
-  }
+    await fetch(SCRIPT_URL);
+  } catch(e) {}
+  showToast(`환영해요, ${myName}님! 🍜`);
   renderMenu();
   renderSummary();
 }
@@ -347,7 +334,7 @@ function renderMenu() {
   grid.innerHTML = "";
 
   MENU.forEach((item, idx) => {
-    const isTaken = !!takenMap[item.id];
+    const isTaken = false;
     const isMine = !!mySelected[item.id];
 
     let badgeHTML = "";
@@ -393,7 +380,6 @@ function renderMenu() {
 
 function toggleSelect(id) {
   if (!myName) { showToast("먼저 이름을 입력해주세요!"); return; }
-  if (takenMap[id]) { showToast("이미 다른 분이 선택한 메뉴예요!"); return; }
   if (mySelected[id]) delete mySelected[id];
   else mySelected[id] = { qty: 1, spice: "보통" };
   renderMenu();
