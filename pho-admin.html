@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍜 PHO TRUCK — 관리자</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E63946;
+    --orange: #F4A261;
+    --cream: #FFF8EF;
+    --dark: #1A0A00;
+    --brown: #5C3317;
+    --green: #2D6A4F;
+    --yellow: #FFD166;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #F0EBE3; font-family: 'Noto Sans KR', sans-serif; color: var(--dark); min-height: 100vh; }
+
+  .header {
+    background: var(--dark);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left {}
+  .header-badge { font-family: 'Unbounded', sans-serif; font-size: 9px; letter-spacing: 3px; color: var(--orange); margin-bottom: 4px; }
+  .header-title { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 900; color: white; }
+  .header-title span { color: var(--orange); }
+
+  .refresh-btn {
+    background: var(--orange);
+    color: var(--dark);
+    border: none;
+    padding: 10px 18px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: transform 0.15s;
+  }
+  .refresh-btn:hover { transform: translateY(-2px); }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* STAT CARDS */
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .stat-label { font-size: 11px; color: #999; margin-bottom: 6px; }
+  .stat-value { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 900; color: var(--dark); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.green { color: var(--green); }
+
+  /* SECTION */
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 3px; color: var(--brown);
+    text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1.5px; background: var(--brown); opacity: 0.2; }
+
+  /* PERSON CARDS */
+  .person-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .person-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--orange);
+  }
+  .person-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--dark); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .person-name::before { content: '👤'; font-size: 16px; }
+  .person-item {
+    display: flex; justify-content: space-between;
+    font-size: 12.5px; padding: 6px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    align-items: center; gap: 8px;
+  }
+  .person-item:last-of-type { border-bottom: none; }
+  .person-item-name { flex: 1; color: #444; }
+  .person-item-qty { font-size: 11px; color: #aaa; margin-right: 4px; }
+  .person-item-price { font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; color: var(--red); white-space: nowrap; }
+  .person-total {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 2px solid var(--dark);
+    display: flex; justify-content: space-between;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px; font-weight: 700;
+  }
+  .spice-tag {
+    font-size: 10px; background: #FFF0E8; color: var(--orange);
+    padding: 1px 7px; border-radius: 10px; border: 1px solid var(--orange);
+    white-space: nowrap;
+  }
+
+  /* MENU SUMMARY TABLE */
+  .menu-table { width: 100%; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 32px; }
+  .menu-table th { background: var(--dark); color: var(--orange); font-family: 'Unbounded', sans-serif; font-size: 10px; letter-spacing: 1.5px; padding: 12px 16px; text-align: left; }
+  .menu-table td { padding: 11px 16px; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+  .menu-table tr:last-child td { border-bottom: none; }
+  .menu-table tr:hover td { background: #fafafa; }
+  .count-badge { display: inline-block; background: var(--red); color: white; font-family: 'Unbounded', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+  .zero-badge { display: inline-block; background: #eee; color: #bbb; font-size: 10px; padding: 2px 9px; border-radius: 20px; }
+
+  /* RAW TABLE */
+  .raw-table { width: 100%; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 12px; }
+  .raw-table th { background: #333; color: #ddd; font-size: 10px; padding: 10px 14px; text-align: left; font-weight: 600; }
+  .raw-table td { padding: 9px 14px; border-bottom: 1px solid #f5f5f5; color: #555; }
+  .raw-table tr:last-child td { border-bottom: none; }
+
+  /* EXPORT */
+  .export-btn {
+    background: var(--green);
+    color: white; border: none;
+    padding: 12px 20px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 700;
+    border-radius: 10px; cursor: pointer;
+    letter-spacing: 0.5px; margin-bottom: 20px;
+    transition: transform 0.15s;
+  }
+  .export-btn:hover { transform: translateY(-2px); }
+
+  .empty-state { text-align: center; padding: 48px; color: #bbb; font-size: 14px; }
+  .empty-emoji { font-size: 48px; margin-bottom: 12px; }
+
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-row { text-align: center; padding: 32px; }
+
+  .last-updated { font-size: 11px; color: #aaa; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-badge">ADMIN PANEL</div>
+    <div class="header-title">PHO <span>TRUCK</span> 관리자</div>
+  </div>
+  <button class="refresh-btn" onclick="loadData()">↻ 새로고침</button>
+</div>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats" id="statsArea">
+    <div class="stat-card"><div class="stat-label">참여 인원</div><div class="stat-value" id="statPeople">—</div></div>
+    <div class="stat-card"><div class="stat-label">총 주문 수</div><div class="stat-value red" id="statOrders">—</div></div>
+    <div class="stat-card"><div class="stat-label">예상 총액</div><div class="stat-value green" id="statTotal">—</div></div>
+    <div class="stat-card"><div class="stat-label">1인 평균</div><div class="stat-value" id="statAvg">—</div></div>
+  </div>
+
+  <div class="last-updated" id="lastUpdated"></div>
+
+  <!-- 인원별 주문 -->
+  <div class="section-title">👤 인원별 주문 현황</div>
+  <div class="person-grid" id="personGrid">
+    <div class="loading-row"><div class="spinner"></div></div>
+  </div>
+
+  <!-- 메뉴별 집계 -->
+  <div class="section-title">📊 메뉴별 집계</div>
+  <table class="menu-table">
+    <thead>
+      <tr><th>메뉴</th><th>주문 수량</th><th>주문자</th><th>소계</th></tr>
+    </thead>
+    <tbody id="menuTableBody">
+      <tr><td colspan="4" class="loading-row"><div class="spinner"></div></td></tr>
+    </tbody>
+  </table>
+
+  <!-- 전체 raw 데이터 -->
+  <div class="section-title">📋 전체 주문 내역</div>
+  <button class="export-btn" onclick="exportCSV()">⬇ CSV 내보내기</button>
+  <table class="raw-table">
+    <thead>
+      <tr><th>제출시간</th><th>이름</th><th>메뉴</th><th>수량</th><th>맵기</th><th>금액</th></tr>
+    </thead>
+    <tbody id="rawTableBody">
+      <tr><td colspan="6" class="loading-row"><div class="spinner"></div></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8OXyd8vBsI29D1AXoA-bce6RXxQyzjhUVhMdTus1E3M5SWOFB5E06sFpETr0Z5Gqg0Q/exec";
+
+const MENU_LIST = [
+  { id:1, emoji:"🍜", name:"포 보 (쌀국수)", price:12000 },
+  { id:2, emoji:"🍗", name:"포 가 (닭고기)", price:11000 },
+  { id:3, emoji:"🥢", name:"분보후에", price:13000 },
+  { id:4, emoji:"🥗", name:"반미 샌드위치", price:9000 },
+  { id:5, emoji:"🍱", name:"분짜", price:13000 },
+  { id:6, emoji:"🧆", name:"짜조 (튀김 스프링롤)", price:8000 },
+  { id:7, emoji:"🫕", name:"라우 (샤브샤브)", price:15000 },
+  { id:8, emoji:"🧃", name:"사탕수수 주스", price:5000 },
+];
+
+let rawOrders = [];
+
+async function loadData() {
+  try {
+    const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
+    const data = await res.json();
+    rawOrders = data.orders || [];
+    render(rawOrders);
+    document.getElementById("lastUpdated").textContent = "마지막 업데이트: " + new Date().toLocaleString("ko-KR");
+  } catch(e) {
+    document.getElementById("personGrid").innerHTML = `<div class="empty-state"><div class="empty-emoji">⚠️</div>데이터를 불러오지 못했어요.<br>새로고침을 눌러주세요.</div>`;
+  }
+}
+
+function render(orders) {
+  if (!orders.length) {
+    document.getElementById("personGrid").innerHTML = `<div class="empty-state"><div class="empty-emoji">🍜</div>아직 주문이 없어요</div>`;
+    document.getElementById("menuTableBody").innerHTML = `<tr><td colspan="4" style="text-align:center;color:#ccc;padding:24px">주문 없음</td></tr>`;
+    document.getElementById("rawTableBody").innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ccc;padding:24px">주문 없음</td></tr>`;
+    document.getElementById("statPeople").textContent = "0";
+    document.getElementById("statOrders").textContent = "0";
+    document.getElementById("statTotal").textContent = "₩0";
+    document.getElementById("statAvg").textContent = "₩0";
+    return;
+  }
+
+  // ── 인원별 그룹핑 ──────────────────────────
+  const byPerson = {};
+  orders.forEach(row => {
+    const name = row["이름"];
+    if (!byPerson[name]) byPerson[name] = [];
+    byPerson[name].push(row);
+  });
+
+  // STATS
+  const people = Object.keys(byPerson).length;
+  const totalAmt = orders.reduce((s, r) => s + Number(r["금액"] || 0), 0);
+  document.getElementById("statPeople").textContent = people + "명";
+  document.getElementById("statOrders").textContent = orders.length + "건";
+  document.getElementById("statTotal").textContent = "₩" + totalAmt.toLocaleString();
+  document.getElementById("statAvg").textContent = "₩" + Math.round(totalAmt / people).toLocaleString();
+
+  // PERSON CARDS
+  let personHTML = "";
+  Object.entries(byPerson).forEach(([name, rows]) => {
+    const personTotal = rows.reduce((s, r) => s + Number(r["금액"] || 0), 0);
+    let itemsHTML = rows.map(r => {
+      const spTag = r["맵기"] && r["맵기"] !== "-" ? `<span class="spice-tag">${r["맵기"]}</span>` : "";
+      return `<div class="person-item">
+        <span class="person-item-name">${r["메뉴명"]}</span>
+        <span class="person-item-qty">×${r["수량"]}</span>
+        ${spTag}
+        <span class="person-item-price">₩${Number(r["금액"]).toLocaleString()}</span>
+      </div>`;
+    }).join("");
+    personHTML += `<div class="person-card">
+      <div class="person-name">${name}</div>
+      ${itemsHTML}
+      <div class="person-total">
+        <span>합계</span>
+        <span style="color:var(--red)">₩${personTotal.toLocaleString()}</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById("personGrid").innerHTML = personHTML;
+
+  // MENU TABLE
+  const menuCount = {};
+  const menuPeople = {};
+  const menuAmt = {};
+  orders.forEach(r => {
+    const n = r["메뉴명"];
+    menuCount[n] = (menuCount[n] || 0) + Number(r["수량"] || 1);
+    menuAmt[n] = (menuAmt[n] || 0) + Number(r["금액"] || 0);
+    if (!menuPeople[n]) menuPeople[n] = [];
+    menuPeople[n].push(r["이름"]);
+  });
+
+  const menuRows = MENU_LIST.map(m => {
+    const cnt = menuCount[m.name] || 0;
+    const amt = menuAmt[m.name] || 0;
+    const people = menuPeople[m.name] || [];
+    return `<tr>
+      <td>${m.emoji} ${m.name}</td>
+      <td>${cnt > 0 ? `<span class="count-badge">${cnt}개</span>` : `<span class="zero-badge">없음</span>`}</td>
+      <td style="color:#888;font-size:12px">${people.join(", ") || "—"}</td>
+      <td style="font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--red)">${amt ? "₩"+amt.toLocaleString() : "—"}</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("menuTableBody").innerHTML = menuRows;
+
+  // RAW TABLE
+  const rawRows = orders.map(r => `<tr>
+    <td>${r["제출시간"]}</td>
+    <td style="font-weight:700">${r["이름"]}</td>
+    <td>${r["메뉴명"]}</td>
+    <td>${r["수량"]}</td>
+    <td>${r["맵기"] || "-"}</td>
+    <td style="font-weight:700;color:var(--red)">₩${Number(r["금액"]).toLocaleString()}</td>
+  </tr>`).join("");
+  document.getElementById("rawTableBody").innerHTML = rawRows;
+}
+
+function exportCSV() {
+  if (!rawOrders.length) { alert("데이터가 없어요."); return; }
+  const headers = ["제출시간", "이름", "메뉴명", "수량", "맵기", "금액"];
+  const rows = rawOrders.map(r => headers.map(h => `"${r[h] || ""}"`).join(","));
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `포트럭파티_주문현황_${new Date().toLocaleDateString("ko-KR").replace(/\. /g,"-").replace(".","")}.csv`;
+  a.click();
+}
+
+loadData();
+setInterval(loadData, 30000); // 30초마다 자동 갱신
+</script>
+</body>
+</html>
